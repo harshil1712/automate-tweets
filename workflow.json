@@ -1,0 +1,119 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "authentication": "basicAuth",
+          "httpMethod": "POST",
+          "path": "webhook-contentful",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [
+          420,
+          240
+        ],
+        "webhookId": "f0c95351-0a42-4659-9eec-f136708b0535",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "27",
+            "name": "Contentful Webhook credential"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "amount": 5,
+          "unit": "minutes"
+        },
+        "name": "Wait",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1,
+        "position": [
+          860,
+          240
+        ],
+        "webhookId": "5ef2434a-cfed-409e-a76f-a71cb1d85cef"
+      },
+      {
+        "parameters": {
+          "text": "=We just published a new entry for #12DaysOfContentful ⚡️\nCheck out {{$node[\"Webhook\"].json[\"body\"][\"title\"]}} by {{$node[\"HTTP Request\"].json[\"fields\"][\"twitterUsername\"]}}!\nhttps://www.contentful.com/devrel-12-days/{{$node[\"Webhook\"].json[\"body\"][\"day\"]}}",
+          "additionalFields": {}
+        },
+        "name": "Twitter",
+        "type": "n8n-nodes-base.twitter",
+        "typeVersion": 1,
+        "position": [
+          1080,
+          240
+        ],
+        "credentials": {
+          "twitterOAuth1Api": {
+            "id": "12",
+            "name": "Twitter OAuth account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpQueryAuth",
+          "url": "=https://cdn.contentful.com/spaces/{SPACE_ID}/environments/master/entries/{{$json[\"body\"][\"author\"]}}",
+          "options": {}
+        },
+        "name": "HTTP Request",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 2,
+        "position": [
+          640,
+          240
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "25",
+            "name": "Contentful CE Demo"
+          },
+          "httpQueryAuth": {
+            "id": "28",
+            "name": "Query Auth account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Twitter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    }
+  }
